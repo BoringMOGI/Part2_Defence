@@ -1,11 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class GameManager : Singleton<GameManager>
 {
     [SerializeField] int life;
     [SerializeField] int gold;
+    [SerializeField] UnityEvent OnGameOver;
 
     TopBarUI topBar;            // 상단바 UI.
 
@@ -32,7 +34,7 @@ public class GameManager : Singleton<GameManager>
         topBar.SetLifeText(life);
         if(life <= 0)
         {
-            OnGameOver();
+            GameOver();
         }
     }
     public void OnGetGold(int amount)
@@ -41,9 +43,21 @@ public class GameManager : Singleton<GameManager>
         topBar.SetGoldText(gold);
     }
 
-    private void OnGameOver()
+    public bool UseGold(int amount)
+    {
+        if(gold >= amount)              // 소지 골드가 요구량 이상인가?
+        {
+            gold -= amount;             // 요구량만큼 골드 소비.
+            topBar.SetGoldText(gold);   // UI 업데이트.
+            return true;                // true 리턴.
+        }
+
+        return false;
+    }
+
+    private void GameOver()
     {
         isGameOver = true;
-        Debug.Log("GameOver");
+        OnGameOver?.Invoke();       // 게임오버 이벤트 호출.
     }
 }

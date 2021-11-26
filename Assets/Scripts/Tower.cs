@@ -4,10 +4,20 @@ using UnityEngine;
 
 public class Tower : MonoBehaviour
 {
-    [SerializeField] Projectile bulletPrefab; // 총알.
+    public enum TOWER_TYPE
+    {
+        Projectile,         // 일반.
+        Expolide,           // 폭발.
+    }
+
+    [SerializeField] TOWER_TYPE type;
+    [SerializeField] Bullet bulletPrefab;     // 총알.
     [SerializeField] float attackRange;       // 공격 범위.
     [SerializeField] float attackRate;        // 공격 속도.
     [SerializeField] float attackPower;       // 공격력.
+    [SerializeField] int towerPrice;          // 타워의 가격.
+
+    public int TowerPrice => towerPrice;
 
     float nextAttackTime = 0.0f;
     Enemy enemy;
@@ -68,7 +78,7 @@ public class Tower : MonoBehaviour
             nextAttackTime = Time.time + attackRate;        // 공격 시간 갱신.            
             if (enemy != null)                              // 적이 탐색되었다면.
             {
-                Projectile bullet = Instantiate(bulletPrefab, transform.position, Quaternion.identity);
+                Bullet bullet = Instantiate(bulletPrefab, transform.position, Quaternion.identity);
                 bullet.Setup(enemy, attackPower);
             }
         }

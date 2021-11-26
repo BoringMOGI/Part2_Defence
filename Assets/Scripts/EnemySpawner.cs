@@ -25,18 +25,22 @@ public class EnemySpawner : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(createCount < enemyCount && nextSpawnTime <= Time.time)
-        {
-            nextSpawnTime = Time.time + spawnTime;
-            createCount++;
-            Spawn();
-        }
+        if (GameManager.Instance.isGameOver)
+            return;
+
+        Spawn();
     }
 
     void Spawn()
     {
-        Enemy enemy = Instantiate(enemyPrefab, vectors[0].position, Quaternion.identity);
-        enemy.transform.SetParent(transform);
-        enemy.Setup(vectors);
+        if (createCount < enemyCount && nextSpawnTime <= Time.time)
+        {
+            nextSpawnTime = Time.time + spawnTime;
+            createCount++;
+
+            Enemy enemy = Instantiate(enemyPrefab, vectors[0].position, Quaternion.identity);
+            enemy.transform.SetParent(transform);
+            enemy.Setup(vectors);
+        }
     }
 }
