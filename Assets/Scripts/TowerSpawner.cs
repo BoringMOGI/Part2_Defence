@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class TowerSpawner : Singleton<TowerSpawner>
 {
@@ -13,8 +14,9 @@ public class TowerSpawner : Singleton<TowerSpawner>
 
     [SerializeField] TowerPrefab[] towerPrefabs;
 
-    Tower.TOWER_TYPE spawnType;
-    GameManager gm;
+    Tower.TOWER_TYPE spawnType;             // 스폰 타입.
+    GameManager gm;                         // 게임 매니저.
+    TileWall selectedTile;                  // 선택한 타일.
 
     private void Start()
     {
@@ -28,27 +30,36 @@ public class TowerSpawner : Singleton<TowerSpawner>
 
         if(Input.GetMouseButtonDown(0))       // 0:왼쪽 마우스 클릭, 1:오른쪽, 2:휠.
         {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-
-            if(Physics.Raycast(ray, out hit))
+            // 마우스 포인터가 layout 안에 있지 않을 경우 설치 가능.
+            if (IsOnUI() == false)
             {
-                TileWall tile = hit.collider.GetComponent<TileWall>();      // 광선을 맞은 물체가 타일 컴포넌트를 들고있는가?
-                if(tile != null)
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                RaycastHit hit;
+
+                if (Physics.Raycast(ray, out hit))
                 {
-                    SpawnTower(tile);
+                    TileWall tile = hit.collider.GetComponent<TileWall>();      // 광선을 맞은 물체가 타일 컴포넌트를 들고있는가?
+                    if(tile != null)
+                        tile.OnSelectedTile();
                 }
             }
         }
     }
+    private bool IsOnUI()
+    {
+        return EventSystem.current.IsPointerOverGameObject();           // 마우스 포인터가 UI위에 있는가?
+    }
 
-    private Tower GetPrefab()
+    public Tower GetCurrentTower()
     {
         // 프리팹 배열을 순회.
         foreach(TowerPrefab prefab in towerPrefabs)
-        {            
+        {
             if (prefab.type == spawnType)       // n번째 프리팹 내부의 type이 동일하다면.
-                return prefab.tower;            // 해당 프리팹을 반환.
+            {
+                Tower newTower = Instantiate(prefab.tower, transform);
+                return newTower;
+            }
         }
 
         return null;
@@ -57,17 +68,5 @@ public class TowerSpawner : Singleton<TowerSpawner>
     public void ChangeTowerType(Tower.TOWER_TYPE spawnType)
     {
         this.spawnType = spawnType;
-    }
-    private void SpawnTower(TileWall tile)
-    {
-        if (tile.IsOnTower)
-            return;
-
-        Tower prefab = GetPrefab();                             // 스폰할 타워의 프리팹을 대입. 
-        if (gm.UseGold(prefab.TowerPrice))                      // 매니저에서 타워의 가격만큼의 골드를 소비했을 경우.
-        {
-            Tower newTower = Instantiate(prefab, transform);    // 생성할 오브젝트, 부모 트랜스폼.
-            tile.SetTower(newTower);                            // 타일에 타워 설치.
-        }
     }
 }

@@ -6,8 +6,12 @@ public class Tower : MonoBehaviour
 {
     public enum TOWER_TYPE
     {
-        Projectile,         // 老馆.
-        Expolide,           // 气惯.
+        Projectile,        // 老馆.
+        Projectile2,
+        Projectile3,
+        Expolde,           // 气惯.
+        Expolde2,
+        Expolde3,
     }
 
     [SerializeField] TOWER_TYPE type;

@@ -4,16 +4,20 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
+
     [SerializeField] float hp;
     [SerializeField] int getGold;
     [SerializeField] float moveSpeed;
 
+
+    System.Action OnDeadEvent;      // 죽었을때 발생하는 이벤트.
     Transform [] vectors;           // 내가 가야할 목적지.
     int vectorIndex;                // 목적지 번호.
 
-    public void Setup(Transform[] vectors)
+    public void Setup(Transform[] vectors, System.Action OnDeadEvent)
     {
         this.vectors = vectors;
+        this.OnDeadEvent = OnDeadEvent;
     }
     public void OnDamaged(float power)
     {
@@ -21,15 +25,22 @@ public class Enemy : MonoBehaviour
         if(hp <= 0)
         {
             GameManager.Instance.OnGetGold(getGold);
-            Destroy(gameObject);
+            OnDead();
         }
     }
 
     private void OnGoal()
     {
         GameManager.Instance.OnDamagedLife(1);      // GameManager의 싱글톤에 접근해 라이프에 데미지를 준다.
+        OnDead();
+    }
+
+    private void OnDead()
+    {
+        OnDeadEvent?.Invoke();          // 해당 이벤트의 참조가 null이지 않을 경우 호출.
         Destroy(gameObject);
     }
+
     private void MoveTo()
     {
         Vector3 destination = vectors[vectorIndex].position;        // 목적지.
