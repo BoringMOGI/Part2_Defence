@@ -20,21 +20,6 @@ public class TileWall : MonoBehaviour
     }
 
     bool isSelected;
-
-    private void OnMouseEnter()             // 마우스 포인터가 들어왔을 때.
-    {
-        OnDisableAllFrame?.Invoke();
-        SwitchFrame(true);
-    }
-    private void OnMouseExit()              // 마우스 포인터가 나갔을 때.
-    {
-        SwitchFrame(false);
-    }
-    private void OnMouseUpAsButton()        // 마우스를 클릭했을 때.
-    {
-        
-    }
-
     private void SwitchFrame(bool isShow)
     {
         selectFrame.SetActive(isShow);
@@ -43,20 +28,59 @@ public class TileWall : MonoBehaviour
 
     public void OnSelectedTile()
     {
-        if(IsOnTower)
+        if (IsOnTower)
         {
             OnDisableAllFrame?.Invoke();                                    // 나머지 타일 프레임 끄기.
             SwitchFrame(true);                                              // 나의 타일 프레임 켜기.
 
-            TowerTool.Instance.OpenTool(transform);                         // Tool UI 출력.
+            TowerTool.Instance.OpenTool(onTower, OnSelectedTowerTool);      // Tool UI 출력.
         }
         else
         {
-            Tower newTower = TowerSpawner.Instance.GetCurrentTower();       // 타워 스포너에게 새로운 타워를 받아온다.
-            newTower.transform.position = transform.position;               // 해당 타워의 포지션을 나에게 맞춘다.
-            onTower = newTower;                                             // 내가 가지고 있는 타워에 대입.
+            Tower newTower = TowerSpawner.Instance.GetSelectedTower();       // 타워 스포너에게 새로운 타워를 받아온다.
+            OnSetupTower(newTower);
         }
     }
 
+    private void OnSetupTower(Tower newTower)
+    {
+        if (newTower == null)
+            return;
+
+        if (onTower)
+            Destroy(onTower.gameObject);                                 // 기존에 설치된 타워를 제거.
+
+        newTower.transform.position = transform.position;                // 해당 타워의 포지션을 나에게 맞춘다.
+        onTower = newTower;                                              // 내가 가지고 있는 타워에 대입.
+    }
+    private void OnSelectedTowerTool(TowerTool.TOOL_TYPE type)
+    {
+        switch(type)
+        {
+            case TowerTool.TOOL_TYPE.Close:
+                break;
+
+            case TowerTool.TOOL_TYPE.Upgrade:
+                if(onTower.TowerLevel < 3)
+                {
+                    Tower nextLevelTower = TowerSpawner.Instance.GetTowerObject(onTower.Type, onTower.TowerLevel + 1);
+                    OnSetupTower(nextLevelTower);
+                }
+                break;
+
+            case TowerTool.TOOL_TYPE.Sell:
+                if(onTower != null)
+                {
+                    int getGold = onTower.SellPrice;                    // 설치된 타워의 가격.
+                    GameManager.Instance.OnGetGold(getGold);            // 해당 가격만큼 GM에게 전달.
+                    Destroy(onTower.gameObject);                        // 설치된 타워 제거.
+                }
+                break;
+        }
+
+        OnDisableAllFrame?.Invoke();                                    // 나머지 타일 프레임 끄기.
+    }
+
+    
     
 }

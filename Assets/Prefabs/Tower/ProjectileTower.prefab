@@ -96,8 +96,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   type: 0
+  towerSprite: {fileID: 21300000, guid: a43bd8d4193581b468bca5e9f0ed3773, type: 3}
   bulletPrefab: {fileID: 6374257460755495953, guid: d4007c5f3d40f4d47ac7f8857bac4e84, type: 3}
   attackRange: 3
   attackRate: 1
   attackPower: 1
+  towerLevel: 1
   towerPrice: 200

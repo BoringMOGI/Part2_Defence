@@ -15,13 +15,20 @@ public class Tower : MonoBehaviour
     }
 
     [SerializeField] TOWER_TYPE type;
+    [SerializeField] Sprite towerSprite;      // 타워의 이미지.
     [SerializeField] Bullet bulletPrefab;     // 총알.
     [SerializeField] float attackRange;       // 공격 범위.
     [SerializeField] float attackRate;        // 공격 속도.
     [SerializeField] float attackPower;       // 공격력.
+    [SerializeField] int towerLevel;          // 타워의 레벨.
     [SerializeField] int towerPrice;          // 타워의 가격.
 
+    public TOWER_TYPE Type => type;
     public int TowerPrice => towerPrice;
+    public int SellPrice => (int)(towerPrice * 0.6f);
+    public int TowerLevel => towerLevel;
+    public Sprite TowerSprite => towerSprite;
+    
 
     float nextAttackTime = 0.0f;
     Enemy enemy;

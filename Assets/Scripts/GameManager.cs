@@ -21,6 +21,9 @@ public class GameManager : Singleton<GameManager>
     private void Start()
     {
         topBar = TopBarUI.Instance;
+    }
+    private void Update()
+    {
         topBar.SetGoldText(gold);
         topBar.SetLifeText(life);
     }
@@ -31,7 +34,6 @@ public class GameManager : Singleton<GameManager>
             return;
 
         life = Mathf.Clamp(life - amount, 0, 999);      // life의 최소 최대 값 제한.
-        topBar.SetLifeText(life);
         if(life <= 0)
         {
             GameOver();
@@ -40,7 +42,6 @@ public class GameManager : Singleton<GameManager>
     public void OnGetGold(int amount)
     {
         gold += amount;
-        topBar.SetGoldText(gold);
     }
 
     public bool UseGold(int amount)
@@ -48,7 +49,6 @@ public class GameManager : Singleton<GameManager>
         if(gold >= amount)              // 소지 골드가 요구량 이상인가?
         {
             gold -= amount;             // 요구량만큼 골드 소비.
-            topBar.SetGoldText(gold);   // UI 업데이트.
             return true;                // true 리턴.
         }
 

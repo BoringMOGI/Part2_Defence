@@ -7,9 +7,9 @@ public class TowerSpawner : Singleton<TowerSpawner>
 {
     [System.Serializable]           // 클래스,구조체의 직렬화.
     public struct TowerPrefab
-    {
-        public Tower tower;
+    {        
         public Tower.TOWER_TYPE type;
+        public Tower[] towers;
     }
 
     [SerializeField] TowerPrefab[] towerPrefabs;
@@ -50,19 +50,50 @@ public class TowerSpawner : Singleton<TowerSpawner>
         return EventSystem.current.IsPointerOverGameObject();           // 마우스 포인터가 UI위에 있는가?
     }
 
-    public Tower GetCurrentTower()
+    public Tower GetSelectedTower()
     {
-        // 프리팹 배열을 순회.
-        foreach(TowerPrefab prefab in towerPrefabs)
+        return GetTowerObject(spawnType, 1);
+    }
+    public Tower GetTowerObject(Tower.TOWER_TYPE type, int level)
+    {
+        Tower towerPrefab = GetTowerPrefab(type, level);
+
+        // 정확한 프리팹을 찾았고 내가 가진 소지금이 충분할 경우.
+        if (towerPrefab != null && gm.UseGold(towerPrefab.TowerPrice))
         {
-            if (prefab.type == spawnType)       // n번째 프리팹 내부의 type이 동일하다면.
+            return Instantiate(towerPrefab);
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    // 타워 프리팹 찾기.
+    private Tower GetTowerPrefab(Tower.TOWER_TYPE type, int level)
+    {
+        Tower towerPrefab = null;
+
+        // towerPrefabs 내부에서 원하는 type과 level을 가진 타워 프리팹을 탐색.
+        foreach (TowerPrefab prefab in towerPrefabs)
+        {
+            if (prefab.type == type)
             {
-                Tower newTower = Instantiate(prefab.tower, transform);
-                return newTower;
+                towerPrefab = prefab.towers[level - 1];
+                break;
             }
         }
 
-        return null;
+        return towerPrefab;
+    }
+
+    public int TowerPrice(Tower.TOWER_TYPE type, int level)
+    {
+        if (level >= 3)
+            return 0;
+
+        Tower prefab = GetTowerPrefab(type, level);
+        return prefab.TowerPrice;
     }
 
     public void ChangeTowerType(Tower.TOWER_TYPE spawnType)
