@@ -45,6 +45,7 @@ public class TowerTool : Singleton<TowerTool>
     }
     public void CloseTool()
     {
+        OnSelectedTool?.Invoke(TOOL_TYPE.Close);
         gameObject.SetActive(false);
     }
 
@@ -58,5 +59,4 @@ public class TowerTool : Singleton<TowerTool>
         OnSelectedTool?.Invoke(TOOL_TYPE.Sell);
         CloseTool();
     }
-
 }

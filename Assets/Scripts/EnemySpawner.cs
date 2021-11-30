@@ -12,13 +12,14 @@ public class EnemySpawner : MonoBehaviour
         End,            // 스폰이 다 끝난 상태.
     }
 
-    [SerializeField] Enemy enemyPrefab;             // 적 프리팹.
+    [SerializeField] Enemy[] enemyPrefabs;          // 적 프리팹.
     [SerializeField] Transform vectorParent;        // 방향.
     [SerializeField] int spawnEnemyCount;           // 생성되는 적 숫자.
     [SerializeField] float spawnTime;               // 스폰 간격 시간.
     [SerializeField] float waveTime;                // 웨이브 간격 시간.
 
     Transform[] vectors;
+    int spawnCount;                                 // 생성 해야하는 수.
     int enemyCount;                                 // 현재 나와있는 적의 수.
 
     float nextWaveTime;
@@ -27,6 +28,7 @@ public class EnemySpawner : MonoBehaviour
     PHASE phase;                                    // 현재 스폰 매니저의 상태.
 
     int wave = 0;
+    int maxWave => enemyPrefabs.Length;
 
 
     void Start()
@@ -56,7 +58,7 @@ public class EnemySpawner : MonoBehaviour
                 {
                     wave += 1;
                     TopBarUI.Instance.SetWaveText(wave);
-
+                    spawnCount = spawnEnemyCount;
                     phase = PHASE.Spawn;
                 }
                 else
@@ -73,8 +75,15 @@ public class EnemySpawner : MonoBehaviour
             case PHASE.End:
                 if (enemyCount <= 0)
                 {
-                    phase = PHASE.Ready;
-                    nextWaveTime = Time.time + waveTime;
+                    if (wave >= maxWave)
+                    {
+                        // 게임 종료.
+                    }
+                    else
+                    {
+                        phase = PHASE.Ready;
+                        nextWaveTime = Time.time + waveTime;
+                    }
                 }
 
                 break;
@@ -88,15 +97,17 @@ public class EnemySpawner : MonoBehaviour
 
     bool Spawn()
     {
-        if (enemyCount >= spawnEnemyCount)
+        if (spawnCount <= 0)
             return false;
 
         if (nextSpawnTime <= Time.time)
         {
             nextSpawnTime = Time.time + spawnTime;
-            enemyCount++;
 
-            Enemy enemy = Instantiate(enemyPrefab, vectors[0].position, Quaternion.identity);
+            spawnCount -= 1;
+            enemyCount += 1;
+
+            Enemy enemy = Instantiate(enemyPrefabs[wave - 1], vectors[0].position, Quaternion.identity);
             enemy.transform.SetParent(transform);
             enemy.Setup(vectors, OnDeadEnemy);
         }

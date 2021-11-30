@@ -4,6 +4,15 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
+    public enum TYPE
+    {
+        Red,
+        Orange,
+        Yellow,
+        Green,
+        Blue,
+    }
+
 
     [SerializeField] float hp;
     [SerializeField] int getGold;

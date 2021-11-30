@@ -7,11 +7,7 @@ public class Tower : MonoBehaviour
     public enum TOWER_TYPE
     {
         Projectile,        // 일반.
-        Projectile2,
-        Projectile3,
         Expolde,           // 폭발.
-        Expolde2,
-        Expolde3,
     }
 
     [SerializeField] TOWER_TYPE type;
@@ -42,6 +38,8 @@ public class Tower : MonoBehaviour
             LookTarget();
             Fire();
         }
+
+        //DrawRange(0.1f, attackRange);
     }
     private void Search()
     {
@@ -49,6 +47,8 @@ public class Tower : MonoBehaviour
         // 2.탐색 우선 순위는 가장 가까운 거리의 적이다.
         if(enemy == null || Vector2.Distance(transform.position, enemy.transform.position) > attackRange)
         {
+            enemy = null;
+
             // 새로운 적 탐색.
             Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, attackRange);
             float minDistance = attackRange;
@@ -93,6 +93,27 @@ public class Tower : MonoBehaviour
                 bullet.Setup(enemy, attackPower);
             }
         }
+    }
+
+    public void DrawRange(float lineWidth, float radius)
+    {
+        var segments = 360;
+        LineRenderer line = GetComponent<LineRenderer>();
+        line.useWorldSpace = false;
+        line.startWidth = lineWidth;
+        line.endWidth = lineWidth;
+        line.positionCount = segments + 1;
+
+        var pointCount = segments + 1; // add extra point to make startpoint and endpoint the same to close the circle
+        var points = new Vector3[pointCount];
+
+        for (int i = 0; i < pointCount; i++)
+        {
+            var rad = Mathf.Deg2Rad * (i * 360f / segments);
+            points[i] = new Vector3(Mathf.Sin(rad) * radius, Mathf.Cos(rad) * radius, 0);
+        }
+
+        line.SetPositions(points);
     }
 
 
