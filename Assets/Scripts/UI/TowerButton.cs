@@ -27,7 +27,7 @@ public class TowerButton : MonoBehaviour
         foreach(TowerButton button in allTowerButtons)
             button.outline.enabled = (button.type == type);
 
-        TowerSpawner.Instance.ChangeTowerType(type);        // 타워 스포너의 스폰 타입을 변경한다.
+        TowerSpawner.Instance.SetupTower(type);        // 타워 스포너의 스폰 타입을 변경한다.
     }
 
 }

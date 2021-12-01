@@ -13,10 +13,11 @@ public class TowerSpawner : Singleton<TowerSpawner>
     }
 
     [SerializeField] TowerPrefab[] towerPrefabs;
+    [SerializeField] LayerMask tileLayer;
 
-    Tower.TOWER_TYPE spawnType;             // 스폰 타입.
     GameManager gm;                         // 게임 매니저.
-    TileWall selectedTile;                  // 선택한 타일.
+    TileWall pointTile;                     // 마우스가 보고 있는 타일.
+    Tower setupTower;                       // 만드려는 타워.
 
     private void Start()
     {
@@ -28,21 +29,52 @@ public class TowerSpawner : Singleton<TowerSpawner>
         if (GameManager.Instance.isGameOver)
             return;
 
-        if(Input.GetMouseButtonDown(0))       // 0:왼쪽 마우스 클릭, 1:오른쪽, 2:휠.
-        {
-            // 마우스 포인터가 layout 안에 있지 않을 경우 설치 가능.
-            if (IsOnUI() == false)
-            {
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                RaycastHit hit;
+        // 마우스 포인터가 위치한 지점의 타일을 검색.
+        RayToTile();
 
-                if (Physics.Raycast(ray, out hit))
+        // 스폰 타입이 지정되어 있지 않으면.
+        if (setupTower == null)
+        {
+            if (pointTile == null)
+                return;
+
+            if (Input.GetMouseButtonDown(0))       // 0:왼쪽 마우스 클릭, 1:오른쪽, 2:휠.
+            {
+                pointTile.OnSelectedTile();
+            }
+        }
+        else   // 어떠한 타워를 설치하려고 함.
+        {
+            Vector3 towerPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            towerPosition.z = 0f;
+            setupTower.transform.position = towerPosition;      // 타워의 위치는 마우스 포인터의 위치다.
+
+            // 마우스가 타일 위에 있고 해당 타일에 타워가 설치되어있지 않을 경우.
+            if (pointTile != null && !pointTile.IsOnTower)                          
+            {
+                setupTower.transform.position = pointTile.transform.position;       // 해당 타일의 위치에 타워를 옮긴다.
+
+                if (Input.GetMouseButtonDown(0))
                 {
-                    TileWall tile = hit.collider.GetComponent<TileWall>();      // 광선을 맞은 물체가 타일 컴포넌트를 들고있는가?
-                    if(tile != null)
-                        tile.OnSelectedTile();
+                    pointTile.OnSetupTower(setupTower);
+                    setupTower = null;
                 }
             }
+        }
+    }
+
+    private void RayToTile()
+    {
+        pointTile = null;
+
+        // 마우스 포인터가 layout 안에 있지 않을 경우 설치 가능.
+        if (IsOnUI() == false)
+        {
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
+
+            if (Physics.Raycast(ray, out hit, 100f, tileLayer))
+                pointTile = hit.collider.GetComponent<TileWall>();      // 광선을 맞은 물체가 타일 컴포넌트를 들고있는가?
         }
     }
     private bool IsOnUI()
@@ -50,43 +82,16 @@ public class TowerSpawner : Singleton<TowerSpawner>
         return EventSystem.current.IsPointerOverGameObject();           // 마우스 포인터가 UI위에 있는가?
     }
 
-    public Tower GetSelectedTower()
-    {
-        return GetTowerObject(spawnType, 1);
-    }
-    public Tower GetTowerObject(Tower.TOWER_TYPE type, int level)
-    {
-        Tower towerPrefab = GetTowerPrefab(type, level);
-
-        // 정확한 프리팹을 찾았고 내가 가진 소지금이 충분할 경우.
-        if (towerPrefab != null && gm.UseGold(towerPrefab.TowerPrice))
-        {
-            return Instantiate(towerPrefab);
-        }
-        else
-        {
-            return null;
-        }
-    }
-
-    // 타워 프리팹 찾기.
+    // 타워 찾기.
     private Tower GetTowerPrefab(Tower.TOWER_TYPE type, int level)
     {
-        Tower towerPrefab = null;
-
-        // towerPrefabs 내부에서 원하는 type과 level을 가진 타워 프리팹을 탐색.
         foreach (TowerPrefab prefab in towerPrefabs)
         {
             if (prefab.type == type)
-            {
-                towerPrefab = prefab.towers[level - 1];
-                break;
-            }
+                return prefab.towers[level - 1];
         }
-
-        return towerPrefab;
+        return null;
     }
-
     public int TowerPrice(Tower.TOWER_TYPE type, int level)
     {
         if (level >= 3)
@@ -96,8 +101,15 @@ public class TowerSpawner : Singleton<TowerSpawner>
         return prefab.TowerPrice;
     }
 
-    public void ChangeTowerType(Tower.TOWER_TYPE spawnType)
+    // 타워 설치.
+    public void SetupTower(Tower.TOWER_TYPE spawnType)
     {
-        this.spawnType = spawnType;
+        // 이미 설치하려는 타워가 생성된 경우 return.
+        if (setupTower != null)
+            return;
+
+        Tower prefab = GetTowerPrefab(spawnType, 1);
+        setupTower = Instantiate(prefab, transform);      // 프리팹 내부의 1레벨 타워 생성.
+        setupTower.SwitchRange(true);
     }
 }

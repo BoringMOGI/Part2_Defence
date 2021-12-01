@@ -18,20 +18,10 @@ public class TowerButtonManager : MonoBehaviour
 
     private void Start()
     {
-        bool isFirst = true;
-
         foreach(TowerData data in towerDatas)
         {
             TowerButton newButton = Instantiate(buttonPrefab, layout);
             newButton.Setup(data.towerSprite, data.towerPrice, data.towerType);
-
-            if(isFirst)
-            {
-                isFirst = false;
-                newButton.OnSelectedButton();
-            }
         }
-
-        
     }
 }

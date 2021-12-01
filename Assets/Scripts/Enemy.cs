@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Enemy : MonoBehaviour
+public class Enemy : Unit
 {
     public enum TYPE
     {
@@ -13,10 +13,14 @@ public class Enemy : MonoBehaviour
         Blue,
     }
 
-
+    [SerializeField] STATE_TYPE moveType;
+    [SerializeField] Transform pivot;
     [SerializeField] float hp;
     [SerializeField] int getGold;
     [SerializeField] float moveSpeed;
+
+    public STATE_TYPE MoveType => moveType;
+    public Vector3 DamagePivot => pivot.position;
 
 
     System.Action OnDeadEvent;      // 죽었을때 발생하는 이벤트.

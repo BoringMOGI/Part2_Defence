@@ -118,4 +118,9 @@ public class EnemySpawner : MonoBehaviour
     {
         enemyCount -= 1;
     }
+    public void OnSkipReady()
+    {
+        nextWaveTime = Time.time;
+        TopBarUI.Instance.SetNextWaveTime(0);
+    }
 }

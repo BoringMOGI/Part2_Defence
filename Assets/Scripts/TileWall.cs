@@ -26,6 +26,22 @@ public class TileWall : MonoBehaviour
         isSelected = isShow;
     }
 
+    // 타일 위에 마우스 포인터 위치.
+    private void OnMouseOver()
+    {
+        if (onTower == null)
+            return;
+
+        onTower.SwitchRange(true);
+    }
+    private void OnMouseExit()
+    {
+        if (onTower == null)
+            return;
+
+        onTower.SwitchRange(false);
+    }
+    // 타일을 선택했다.
     public void OnSelectedTile()
     {
         if (IsOnTower)
@@ -35,14 +51,9 @@ public class TileWall : MonoBehaviour
 
             TowerTool.Instance.OpenTool(onTower, OnSelectedTowerTool);      // Tool UI 출력.
         }
-        else
-        {
-            Tower newTower = TowerSpawner.Instance.GetSelectedTower();       // 타워 스포너에게 새로운 타워를 받아온다.
-            OnSetupTower(newTower);
-        }
     }
 
-    private void OnSetupTower(Tower newTower)
+    public void OnSetupTower(Tower newTower)
     {
         if (newTower == null)
             return;
@@ -51,6 +62,7 @@ public class TileWall : MonoBehaviour
             Destroy(onTower.gameObject);                                 // 기존에 설치된 타워를 제거.
 
         newTower.transform.position = transform.position;                // 해당 타워의 포지션을 나에게 맞춘다.
+        newTower.OnSetupTower();                                         // 해당 타워가 설치되었음을 알림.
         onTower = newTower;                                              // 내가 가지고 있는 타워에 대입.
     }
     private void OnSelectedTowerTool(TowerTool.TOOL_TYPE type)
@@ -61,11 +73,13 @@ public class TileWall : MonoBehaviour
                 break;
 
             case TowerTool.TOOL_TYPE.Upgrade:
+                /*
                 if(onTower.TowerLevel < 3)
                 {
                     Tower nextLevelTower = TowerSpawner.Instance.GetTowerObject(onTower.Type, onTower.TowerLevel + 1);
                     OnSetupTower(nextLevelTower);
                 }
+                */
                 break;
 
             case TowerTool.TOOL_TYPE.Sell:
@@ -80,7 +94,5 @@ public class TileWall : MonoBehaviour
 
         OnDisableAllFrame?.Invoke();                                    // 나머지 타일 프레임 끄기.
     }
-
-    
     
 }

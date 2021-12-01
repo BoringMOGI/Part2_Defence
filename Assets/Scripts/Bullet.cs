@@ -31,10 +31,10 @@ public abstract class Bullet : MonoBehaviour
 
     private void MoveTo()
     {
-        transform.position = Vector3.MoveTowards(transform.position, target.transform.position, speed * Time.deltaTime);
+        transform.position = Vector3.MoveTowards(transform.position, target.DamagePivot, speed * Time.deltaTime);
 
         // 나와 상대의 거리가 (많이) 가까워졌다면.
-        if (Vector2.Distance(transform.position, target.transform.position) <= float.Epsilon)
+        if (Vector2.Distance(transform.position, target.DamagePivot) <= float.Epsilon)
         {
             HitTarget();
             OnCrush();
