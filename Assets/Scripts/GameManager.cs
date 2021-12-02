@@ -59,5 +59,24 @@ public class GameManager : Singleton<GameManager>
     {
         isGameOver = true;
         OnGameOver?.Invoke();       // 게임오버 이벤트 호출.
+
+        Invoke("OpenNotice", 1.0f);
     }
+
+    private void OpenNotice()
+    {
+        // 람다식 : 이름 없는 임시 함수.
+        Notice.Instance.OpenNotice("재시작 하겠습니까?", "네", "아니오", (Notice.RESPONSE response) => {
+
+            if (response == Notice.RESPONSE.Yes)        // 긍정.
+            {
+                SceneManager.Instance.LoadNextScene("Game");
+            }
+            else if (response == Notice.RESPONSE.No)   // 부정.
+            {
+                SceneManager.Instance.LoadNextScene("Main");
+            }
+        });
+    }
+    
 }

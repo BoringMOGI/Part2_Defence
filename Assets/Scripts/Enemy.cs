@@ -1,8 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class Enemy : Unit
+public class Enemy : Unit, IHealth
 {
     public enum TYPE
     {
@@ -15,7 +13,8 @@ public class Enemy : Unit
 
     [SerializeField] STATE_TYPE moveType;
     [SerializeField] Transform pivot;
-    [SerializeField] float hp;
+    [SerializeField] Transform hpBarPivot;
+    [SerializeField] float maxHp;
     [SerializeField] int getGold;
     [SerializeField] float moveSpeed;
 
@@ -24,18 +23,24 @@ public class Enemy : Unit
 
 
     System.Action OnDeadEvent;      // 죽었을때 발생하는 이벤트.
-    Transform [] vectors;           // 내가 가야할 목적지.
+    Transform[] vectors;            // 내가 가야할 목적지.
     int vectorIndex;                // 목적지 번호.
+    float hp;                       // 현재 체력.
+    bool isAlive;                   // 생존 여부.
 
     public void Setup(Transform[] vectors, System.Action OnDeadEvent)
     {
-        this.vectors = vectors;
-        this.OnDeadEvent = OnDeadEvent;
+        this.vectors = vectors;                 // 나아가야할 벡터 대입.
+        this.OnDeadEvent = OnDeadEvent;         // 죽었을때 이벤트.
+        hp = maxHp;                             // 현재 체력을 최대 체력으로 변환.
+        isAlive = true;
+
+        HpBarUI.Instance.SetHpBar(this);        // 체력바UI에게 나의 인터페이스를 전달.
     }
     public void OnDamaged(float power)
     {
         hp -= power;
-        if(hp <= 0)
+        if (hp <= 0)
         {
             GameManager.Instance.OnGetGold(getGold);
             OnDead();
@@ -47,13 +52,12 @@ public class Enemy : Unit
         GameManager.Instance.OnDamagedLife(1);      // GameManager의 싱글톤에 접근해 라이프에 데미지를 준다.
         OnDead();
     }
-
     private void OnDead()
     {
         OnDeadEvent?.Invoke();          // 해당 이벤트의 참조가 null이지 않을 경우 호출.
+        isAlive = false;
         Destroy(gameObject);
     }
-
     private void MoveTo()
     {
         Vector3 destination = vectors[vectorIndex].position;        // 목적지.
@@ -84,5 +88,27 @@ public class Enemy : Unit
         {
             MoveTo();                   // 이동.
         }
+    }
+
+    public float GetCurrentHP()
+    {
+        return hp;
+    }
+
+    public float GetMaxHp()
+    {
+        return maxHp;
+    }
+
+    public Vector3 GetPosition()
+    {
+        if (hpBarPivot == null)
+            return Vector3.zero;
+        else
+            return hpBarPivot.position;
+    }
+    public bool IsAlive()
+    {
+        return isAlive;
     }
 }

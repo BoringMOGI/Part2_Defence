@@ -9,8 +9,19 @@ public class TowerButton : MonoBehaviour
     [SerializeField] Image outline;
     [SerializeField] Text priceText;
 
+    // static변수는 클래스에 속하는 변수로 1개만 존재한다.
+    // 생성 시점은 최초로 사용될 때 한 번, 해제 시점은 프로그램의 종료.
     static List<TowerButton> allTowerButtons = new List<TowerButton>();
     Tower.TOWER_TYPE type;
+
+    public static int Number = 10;
+
+    // 게임 오브젝트가 Destroy되었을때 호출되는 이벤트 함수.
+    private void OnDestroy()
+    {
+        Debug.Log("Destroy : " + name);
+        allTowerButtons.Remove(this);
+    }
 
     public void Setup(Sprite towerSprite, int price, Tower.TOWER_TYPE type)
     {
