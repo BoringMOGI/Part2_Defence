@@ -70,11 +70,11 @@ public class GameManager : Singleton<GameManager>
 
             if (response == Notice.RESPONSE.Yes)        // ±‡¡§.
             {
-                SceneManager.Instance.LoadNextScene("Game");
+                SceneManager.Instance.LoadNextScene(SceneManager.SCENE.Game);
             }
             else if (response == Notice.RESPONSE.No)   // ∫Œ¡§.
             {
-                SceneManager.Instance.LoadNextScene("Main");
+                SceneManager.Instance.LoadNextScene(SceneManager.SCENE.Main);
             }
         });
     }

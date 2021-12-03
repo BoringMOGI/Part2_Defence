@@ -6,7 +6,16 @@ using UnityEngine.SceneManagement;
 
 public class SceneManager : Singleton<SceneManager>
 {
+    public enum SCENE
+    {
+        Main,
+        Game,
+        Option,
+    }
+
     [SerializeField] Image panel;
+
+    private static SCENE currentScene;
 
     Color fadeColor;
     bool isLoading;
@@ -17,13 +26,24 @@ public class SceneManager : Singleton<SceneManager>
         StartCoroutine(FadeIn(1.0f));
     }
 
-    public void LoadNextScene(string nextScene, float fadeTime = 1.0f)
+    public void LoadNextScene(SCENE nextScene, float fadeTime = 1.0f)
     {
         if (isLoading)
             return;
 
         isLoading = true;
-        StartCoroutine(FadeOut(fadeTime, nextScene));
+        currentScene = nextScene;
+        StartCoroutine(FadeOut(fadeTime, nextScene.ToString()));
+    }
+    public void OpenOption()
+    {
+        // LoadSceneMode.Single   : 해당 씬 하나만 단독으로 불러오겠다. (기존에 있던 씬은 다 언로드 된다.)
+        // LoadSceneMode.Additive : 해당 씬을 추가해서 로드한다. (기존에 있던 씬은 언로드되지 않는다.)
+        UnityEngine.SceneManagement.SceneManager.LoadScene(SCENE.Option.ToString(), LoadSceneMode.Additive);
+    }
+    public void CloseOption()
+    {
+        UnityEngine.SceneManagement.SceneManager.UnloadSceneAsync(SCENE.Option.ToString());
     }
 
 
