@@ -101,6 +101,7 @@ MonoBehaviour:
   bulletPrefab: {fileID: 6374257460755495953, guid: d4007c5f3d40f4d47ac7f8857bac4e84, type: 3}
   towerLevel: 2
   towerPrice: 800
+  attackSound: crossbow
   attackType: 1
   attackRange: 3
   attackRate: 1

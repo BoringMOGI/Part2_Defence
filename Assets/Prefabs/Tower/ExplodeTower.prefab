@@ -101,6 +101,7 @@ MonoBehaviour:
   bulletPrefab: {fileID: 6391982466698460246, guid: c99ad0822c23cda4b9c77fd4fb94e878, type: 3}
   towerLevel: 1
   towerPrice: 500
+  attackSound: cannon_01
   attackType: -1
   attackRange: 5
   attackRate: 2

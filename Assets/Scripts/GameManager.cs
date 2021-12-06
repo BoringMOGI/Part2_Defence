@@ -21,11 +21,17 @@ public class GameManager : Singleton<GameManager>
     private void Start()
     {
         topBar = TopBarUI.Instance;
+        AudioManager.Instance.PlayBgm("MainBGM");
     }
     private void Update()
     {
         topBar.SetGoldText(gold);
         topBar.SetLifeText(life);
+
+        if(Input.GetKeyDown(KeyCode.Space))
+        {
+            AudioManager.Instance.PlayEffect("magic_03");
+        }
     }
 
     public void OnDamagedLife(int amount)

@@ -19,6 +19,7 @@ public class Tower : Unit
     [SerializeField] int towerPrice;          // 타워의 가격.
 
     [Header("Attack")]
+    [SerializeField] string attackSound;      // 공격 사운드.
     [SerializeField] STATE_TYPE attackType;   // 공격 타입.
     [SerializeField] float attackRange;       // 공격 범위.
     [SerializeField] float attackRate;        // 공격 속도.
@@ -114,11 +115,10 @@ public class Tower : Unit
             {
                 Bullet bullet = Instantiate(bulletPrefab, transform.position, Quaternion.identity);
                 bullet.Setup(enemy, attackPower);
+                AudioManager.Instance.PlayEffect(attackSound);
             }
         }
     }
-
-
 
     private void SetupRangeLine()
     {
