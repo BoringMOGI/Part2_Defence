@@ -2,8 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AudioManager : Singleton<AudioManager>
+public class AudioManager : ObjectPool<AudioEffect>
 {
+    static AudioManager instance;
+    public static AudioManager Instance => instance;
+
     public enum AUDIO
     {
         Master,
@@ -24,13 +27,14 @@ public class AudioManager : Singleton<AudioManager>
 
     [Header("Source")]
     [SerializeField] AudioSource bgmSource;
-    
-    [Header("Pooling")]
-    [SerializeField] AudioEffect effectPrefab;
-    [SerializeField] Transform poolParent;        // 풀링할 오브젝트가 들어있는 부모 오브젝트.
-    [SerializeField] int initEffectCount;
 
-    Stack<AudioEffect> poolStorage;               // 풀링 오브젝트가 들어있는 스택 변수.
+    // 상속하고 있는 부모 Awake 함수와 중복이기 때문에
+    // new키워드를 붙여서 다른 함수라는 것을 알림.
+    protected new void Awake()
+    {
+        base.Awake();
+        instance = this;
+    }
 
     private void Start()
     {
@@ -39,38 +43,8 @@ public class AudioManager : Singleton<AudioManager>
         bgmVolumn = PlayerPrefs.HasKey(KEY_BGM)       ? PlayerPrefs.GetFloat(KEY_BGM) : 1f;
         effectVolumn = PlayerPrefs.HasKey(KEY_EFFECT) ? PlayerPrefs.GetFloat(KEY_EFFECT) : 1f;
 
-        bgmSource.volume = bgmVolumn * masterVolumn;        // 최초 배경음 크기 설정.
-
-        poolStorage = new Stack<AudioEffect>();             // stack에 객체 생성.
-        CreatePool(initEffectCount);                        // 최초 개수 만큼 오브젝트 생성.
+        bgmSource.volume = bgmVolumn * masterVolumn;        // 최초 배경음 크기 설정.               
     }
-
-
-    void CreatePool(int count = 1)
-    {
-        // count 수만큼 풀링 오브젝트를 생성 후 Stack에 대입.
-        for (int i = 0; i < count; i++)
-        {
-            AudioEffect newEffect = Instantiate(effectPrefab, poolParent);
-            newEffect.Setup(OnReturnPool);
-            poolStorage.Push(newEffect);
-        }
-    }
-    AudioEffect GetPool()
-    {
-        if (poolStorage.Count <= 0)         // 저장소에 풀링 오브젝트가 없다면.
-            CreatePool();                   // 하나 생성.
-
-        AudioEffect effect = poolStorage.Pop();
-        effect.transform.SetParent(transform);
-        return effect;
-    }
-    void OnReturnPool(AudioEffect effect)
-    {
-        effect.transform.SetParent(poolParent);
-        poolStorage.Push(effect);
-    }
-    
 
     public void OnChangedVolumn(AUDIO type, float value)
     {

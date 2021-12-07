@@ -45,6 +45,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 390fca6b2ddf7ef4f8d099c33452a2b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  storageParent: {fileID: 4947151800440760506}
+  prefab: {fileID: -6367978145190150177, guid: 981b242d3ab34874595a21e92e6e9f16, type: 3}
+  createCount: 20
   bgms:
   - {fileID: 8300000, guid: 3ba6d69feea6c664daa111e1b706e3d4, type: 3}
   effects:
@@ -62,9 +65,6 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 78419f98379502c4dbfb2774bc94e7c1, type: 3}
   - {fileID: 8300000, guid: 5e1a9f876d3dafd47bc6b3dde25135fa, type: 3}
   bgmSource: {fileID: 31163781}
-  effectPrefab: {fileID: -6367978145190150177, guid: 981b242d3ab34874595a21e92e6e9f16, type: 3}
-  poolParent: {fileID: 4947151800440760506}
-  initEffectCount: 20
 --- !u!82 &31163781
 AudioSource:
   m_ObjectHideFlags: 0
@@ -171,7 +171,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4947151800440760506}
   m_Layer: 0
-  m_Name: PoolParent
+  m_Name: StorageParent
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

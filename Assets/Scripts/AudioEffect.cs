@@ -4,18 +4,17 @@ using UnityEngine;
 
 // 해당 클래스가 존재하려면 AudioSource가 있어야한다.
 [RequireComponent(typeof(AudioSource))]
-public class AudioEffect : MonoBehaviour
+public class AudioEffect : MonoBehaviour, ObjectPool<AudioEffect>.IPool
 {
-    public delegate void OnReturnPoolEvent(AudioEffect effect);
-    public event OnReturnPoolEvent OnReturnPool;
-
     AudioSource source;
+    ObjectPool<AudioEffect>.OnReturnPoolEvent OnReturnPool;
 
-    public void Setup(OnReturnPoolEvent OnReturnPool)
+    public void Setup(ObjectPool<AudioEffect>.OnReturnPoolEvent OnReturnPool)
     {
-        source = GetComponent<AudioSource>();
         this.OnReturnPool = OnReturnPool;
+        source = GetComponent<AudioSource>();
     }
+
     public void Play(AudioClip clip, float volumn)
     {
         source.clip = clip;
